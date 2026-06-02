@@ -4,143 +4,166 @@ import { useState } from "react";
 import Link from "next/link";
 
 export default function Header() {
-  // Состояния для демонстрации интерактивности без бэкенда
+  // Логика имитации входа для защиты диплома
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
+  const navLinks = [
+    { name: "Каталог", href: "/catalog" },
+    { name: "Аукционы", href: "/#auctions" },
+    { name: "О нас", href: "/#about" },
+    { name: "Помощь", href: "/tariffs" },
+  ];
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-brand-border bg-brand-bg/95 backdrop-blur">
-      <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between px-6 md:px-12">
+    <div className="fixed top-6 left-0 w-full z-50 px-4 font-sans">
+      <nav className="max-w-7xl mx-auto bg-black/60 backdrop-blur-xl border border-white/10 p-3 rounded-2xl flex justify-between items-center shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
         
-        {/* Логотип */}
-        <Link href="/" className="text-2xl font-black tracking-wider">
-          <span className="text-white">QAZ</span>
-          <span className="text-brand-orange">DRIVE</span>
-        </Link>
-
-        {/* Навигация */}
-        <nav className="hidden items-center gap-8 md:flex">
-          <Link href="/catalog" className="text-sm font-semibold text-brand-textSecondary hover:text-brand-orange transition-colors">
-            КАТАЛОГ
+        {/* ЛОГОТИП */}
+        <div className="pl-6">
+          <Link href="/" className="group flex items-center active:scale-95 transition-transform">
+            <span className="text-2xl font-black italic tracking-tighter text-white">
+              QAZ<span className="text-orange-500 underline decoration-2 underline-offset-4 decoration-orange-500/20 uppercase">DRIVE</span>
+            </span>
           </Link>
-          <span className="text-sm font-semibold text-brand-textSecondary cursor-not-allowed opacity-50">
-            АУКЦИОНЫ
-          </span>
-          <span className="text-sm font-semibold text-brand-textSecondary cursor-not-allowed opacity-50">
-            О НАС
-          </span>
-          <Link href="/tariffs" className="text-sm font-semibold text-brand-textSecondary hover:text-brand-orange transition-colors">
-            ТАРИФЫ
-          </Link>
-        </nav>
+        </div>
 
-        {/* Правая часть (Авторизация / Профиль) */}
-        <div className="flex items-center gap-6">
+        {/* НАВИГАЦИОННЫЕ ССЫЛКИ */}
+        <div className="hidden lg:flex gap-12 items-center text-left">
+          {navLinks.map((link) => (
+            <Link 
+              key={link.name} 
+              href={link.href} 
+              className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-white transition-all italic duration-300 active:scale-90"
+            >
+              {link.name}
+            </Link>
+          ))}
+        </div>
+
+        {/* АВТОРИЗАЦИЯ И ПРОФИЛЬ */}
+        <div className="flex gap-4 pr-2">
           {!isLoggedIn ? (
-            /* Гостевой режим */
-            <div className="flex items-center gap-6">
+            /* ГОСТЕВОЙ РЕЖИМ */
+            <div className="flex gap-4">
               <button 
                 onClick={() => setIsLoggedIn(true)} 
-                className="text-sm font-bold text-white hover:text-brand-orange transition-colors"
+                className="text-[10px] font-black uppercase tracking-widest text-white px-8 py-3 rounded-xl border border-white/10 hover:bg-white hover:text-black transition-all italic cursor-pointer active:scale-95"
               >
-                ВХОД
+                Вход
               </button>
               <Link 
                 href="/register" 
-                className="rounded-lg bg-brand-orange px-6 py-2.5 text-sm font-bold text-white hover:bg-brand-orangeHover transition-colors"
+                className="bg-orange-500 text-black text-[10px] font-black px-10 py-3 rounded-xl uppercase tracking-widest hover:bg-white transition-all italic shadow-lg shadow-orange-500/20 active:scale-95"
               >
-                РЕГИСТРАЦИЯ
+                Регистрация
               </Link>
             </div>
           ) : (
-            /* Режим авторизованного пользователя */
-            <div className="flex items-center gap-4 relative">
+            /* АВТОРИЗОВАННЫЙ ПОЛЬЗОВАТЕЛЬ */
+            <div className="flex items-center gap-4 relative pl-6 border-l border-white/5">
               
               {/* Колокольчик уведомлений */}
-              <button 
-                onClick={() => {
-                  setShowNotifications(!showNotifications);
-                  setShowProfileMenu(false);
-                }}
-                className="relative rounded-full p-2 hover:bg-brand-card transition-colors"
-              >
-                <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand-orange text-[10px] font-bold text-white">
-                  2
-                </span>
-                <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
-              </button>
+              <div className="relative">
+                <button 
+                  onClick={() => {
+                    setShowNotifications(!showNotifications);
+                    setShowProfileMenu(false);
+                  }}
+                  className="relative rounded-xl p-2.5 bg-white/5 border border-white/10 hover:border-orange-500 transition-colors text-white cursor-pointer"
+                >
+                  <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-[10px] font-black text-black">
+                    2
+                  </span>
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                  </svg>
+                </button>
 
-              {/* Выпадающее окно уведомлений */}
-              {showNotifications && (
-                <div className="absolute right-12 top-14 w-80 rounded-xl border border-brand-border bg-brand-card p-4 shadow-2xl">
-                  <div className="flex items-center justify-between border-b border-brand-border pb-2 mb-3">
-                    <span className="font-bold text-sm">Уведомления</span>
-                    <button className="text-xs text-brand-orange hover:underline">Прочитать все</button>
-                  </div>
-                  <div className="space-y-3 max-h-60 overflow-y-auto">
-                    <div className="text-xs border-b border-brand-border/50 pb-2">
-                      <p className="font-semibold text-red-400">Вашу ставку перебили</p>
-                      <p className="text-brand-textSecondary mt-0.5">В лоте LOT-011 — Aston Martin DB11 ваша ставка перебита.</p>
-                      <span className="text-[10px] text-brand-textSecondary/75 block mt-1">02.06.2026, 15:20</span>
+                {/* Выпадающее меню уведомлений */}
+                {showNotifications && (
+                  <div className="absolute right-0 top-14 w-80 rounded-2xl border border-white/5 bg-[#0f172a] p-5 shadow-2xl z-50 text-left">
+                    <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-3">
+                      <span className="font-black text-[10px] uppercase tracking-wider text-white">Уведомления</span>
+                      <button className="text-[9px] font-black text-orange-500 hover:underline uppercase tracking-wider">Прочитать все</button>
                     </div>
-                    <div className="text-xs">
-                      <p className="font-semibold text-brand-orange">Новый лот на аукционе</p>
-                      <p className="text-brand-textSecondary mt-0.5">Добавлен новый лот: BMW X6 M Competition 2024.</p>
-                      <span className="text-[10px] text-brand-textSecondary/75 block mt-1">02.06.2026, 05:20</span>
+                    <div className="space-y-3 max-h-60 overflow-y-auto no-scrollbar">
+                      <div className="text-xs border-b border-white/5 pb-3">
+                        <p className="font-bold text-red-400">Вашу ставку перебили</p>
+                        <p className="text-slate-400 text-[10px] leading-relaxed mt-1 font-medium">В лоте LOT-011 — Aston Martin DB11 ваша ставка перебита.</p>
+                        <span className="text-[8px] font-bold text-slate-500 block mt-1.5">02.06.2026, 15:20</span>
+                      </div>
+                      <div className="text-xs">
+                        <p className="font-bold text-orange-500">Новый лот на аукционе</p>
+                        <p className="text-slate-400 text-[10px] leading-relaxed mt-1 font-medium">Добавлен новый лот: BMW X6 M Competition 2024.</p>
+                        <span className="text-[8px] font-bold text-slate-500 block mt-1.5">02.06.2026, 05:20</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
 
-              {/* Меню профиля */}
+              {/* Профиль Алибека */}
               <div className="relative">
                 <button 
                   onClick={() => {
                     setShowProfileMenu(!showProfileMenu);
                     setShowNotifications(false);
                   }}
-                  className="flex items-center gap-2 rounded-lg border border-brand-border bg-brand-card p-1.5 pr-3 hover:border-brand-orange transition-colors"
+                  className="flex items-center gap-4 group active:scale-95 transition-all min-w-[170px] cursor-pointer"
                 >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-orange text-sm font-bold text-white">
-                    А
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center border-2 border-orange-500/20 shadow-[0_0_25px_rgba(249,115,22,0.15)] bg-slate-900 group-hover:bg-white overflow-hidden transition-all duration-300">
+                    <div className="w-full h-full bg-orange-500 flex items-center justify-center text-black font-black text-xl uppercase italic">
+                      А
+                    </div>
                   </div>
-                  <span className="text-sm font-semibold text-white">Алибек</span>
-                  <svg className={`h-4 w-4 text-brand-textSecondary transition-transform ${showProfileMenu ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                  </svg>
+                  <div className="flex flex-col text-left justify-center">
+                    <span className="text-[12px] font-black text-white uppercase italic tracking-widest group-hover:text-orange-500 transition-colors leading-none">
+                      Алибек
+                    </span>
+                    <span className="text-[10px] text-green-500 font-black tracking-[0.2em] leading-none mt-1.5 shadow-sm">
+                      0 ₸
+                    </span>
+                  </div>
                 </button>
 
                 {/* Выпадающее меню профиля */}
                 {showProfileMenu && (
-                  <div className="absolute right-0 top-12 w-64 rounded-xl border border-brand-border bg-brand-card p-4 shadow-2xl">
-                    <div className="border-b border-brand-border pb-3 mb-3">
-                      <p className="font-bold text-sm text-white">Алибек Джаксыбеков</p>
-                      <p className="text-xs text-brand-textSecondary mt-0.5">user@drive.kz</p>
-                      <span className="inline-block mt-2 rounded bg-brand-orange/20 px-2 py-0.5 text-[10px] font-bold text-brand-orange">
+                  <div className="absolute right-0 top-16 w-64 rounded-2xl border border-white/5 bg-[#0f172a] p-5 shadow-2xl z-50 text-left">
+                    <div className="border-b border-white/5 pb-3 mb-3">
+                      <p className="font-black text-xs text-white uppercase italic">Алибек Джаксыбеков</p>
+                      <p className="text-[10px] text-slate-500 mt-1">user@drive.kz</p>
+                      <span className="inline-block mt-2 rounded bg-orange-500/15 px-2.5 py-1 text-[8px] font-black text-orange-500 tracking-widest">
                         DRIVE
                       </span>
                     </div>
                     <ul className="space-y-1.5">
                       <li>
-                        <Link href="/profile" onClick={() => setShowProfileMenu(false)} className="flex items-center gap-2 rounded-lg px-2 py-2 text-sm text-brand-textSecondary hover:bg-brand-bg hover:text-white transition-colors">
+                        <Link 
+                          href="/profile" 
+                          onClick={() => setShowProfileMenu(false)} 
+                          className="flex items-center gap-2 rounded-lg px-2 py-2 text-xs font-bold text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
+                        >
                           Мой профиль
                         </Link>
                       </li>
                       <li>
-                        <Link href="/tariffs" onClick={() => setShowProfileMenu(false)} className="flex items-center gap-2 rounded-lg px-2 py-2 text-sm text-brand-textSecondary hover:bg-brand-bg hover:text-white transition-colors">
+                        <Link 
+                          href="/tariffs" 
+                          onClick={() => setShowProfileMenu(false)} 
+                          className="flex items-center gap-2 rounded-lg px-2 py-2 text-xs font-bold text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
+                        >
                           Тарифы
                         </Link>
                       </li>
-                      <li className="border-t border-brand-border/50 pt-1.5 mt-1.5">
+                      <li className="border-t border-white/5 pt-1.5 mt-1.5">
                         <button 
                           onClick={() => {
                             setIsLoggedIn(false);
                             setShowProfileMenu(false);
                           }}
-                          className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
+                          className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-xs font-bold text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
                         >
                           Выйти
                         </button>
@@ -154,7 +177,7 @@ export default function Header() {
           )}
         </div>
 
-      </div>
-    </header>
+      </nav>
+    </div>
   );
 }
