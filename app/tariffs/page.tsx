@@ -1,254 +1,177 @@
 "use client";
 
 import { useState } from "react";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import Link from "next/link";
 
-// Данные для карточек тарифов
-const TARIFFS = [
-  {
-    name: "БАЗОВЫЙ",
-    tagline: "ДЛЯ ОЗНАКОМЛЕНИЯ",
-    price: "0 ₸",
-    features: [
-      { text: "1 активная ставка", included: true },
-      { text: "Поиск по фильтрам", included: true },
-      { text: "Email-уведомления", included: true },
-      { text: "История продаж авто", included: false },
-      { text: "SMS-оповещения", included: false },
-      { text: "VIN-отчеты", included: false },
-      { text: "Техподдержка 24/7", included: false },
-    ],
-    buttonText: "ВЫБРАТЬ ПЛАН",
-    isCurrent: false,
-    isPopular: false,
+const PLANS = [
+  { 
+    name: "Базовый", 
+    price: "0 ₸", 
+    features: ["1 активная ставка", "Поиск по фильтрам", "Email-уведомления"], 
+    color: "border-slate-700",
+    desc: "Для ознакомления",
+    char: "Б"
   },
-  {
-    name: "СТАНДАРТ",
-    tagline: "ДЛЯ ЧАСТНЫХ ЛИЦ",
-    price: "25 000 ₸",
-    features: [
-      { text: "До 3 активных ставок", included: true },
-      { text: "Поиск по фильтрам", included: true },
-      { text: "Email-уведомления", included: true },
-      { text: "История продаж авто", included: true },
-      { text: "SMS-оповещения", included: true },
-      { text: "VIN-отчеты", included: false },
-      { text: "Техподдержка 24/7", included: false },
-    ],
-    buttonText: "ВЫБРАТЬ ПЛАН",
-    isCurrent: false,
-    isPopular: false,
+  { 
+    name: "Стандарт", 
+    price: "25 000 ₸", 
+    features: ["До 3 активных ставок", "История продаж авто", "SMS-оповещения"], 
+    color: "border-blue-500",
+    desc: "Для частных лиц",
+    char: "С"
   },
-  {
-    name: "ДРАЙВ",
-    tagline: "САМЫЙ ПОПУЛЯРНЫЙ",
-    price: "55 000 ₸",
-    features: [
-      { text: "Безлимитные ставки", included: true },
-      { text: "Поиск по фильтрам", included: true },
-      { text: "Email-уведомления", included: true },
-      { text: "История продаж авто", included: true },
-      { text: "SMS-оповещения", included: true },
-      { text: "Полный отчет по VIN", included: true },
-      { text: "Техподдержка 24/7", included: true },
-    ],
-    buttonText: "ТЕКУЩИЙ ПЛАН",
-    isCurrent: true,
-    isPopular: true,
+  { 
+    name: "Драйв", 
+    price: "55 000 ₸", 
+    features: ["Безлимитные ставки", "Полный отчет по VIN", "Техподдержка 24/7"], 
+    color: "border-orange-500 shadow-[0_0_25px_rgba(249,115,22,0.15)]",
+    desc: "Самый популярный",
+    char: "Д",
+    isPopular: true
   },
-  {
-    name: "БИЗНЕС",
-    tagline: "ДЛЯ МАЛЫХ ДИЛЕРОВ",
-    price: "125 000 ₸",
-    features: [
-      { text: "Безлимитные ставки", included: true },
-      { text: "Приоритетные доки", included: true },
-      { text: "Скидка на доставку", included: true },
-      { text: "До 10 авто в месяц", included: true },
-      { text: "SMS + Push уведомления", included: true },
-      { text: "Полный отчет по VIN", included: true },
-      { text: "Техподдержка 24/7", included: true },
-    ],
-    buttonText: "ВЫБРАТЬ ПЛАН",
-    isCurrent: false,
-    isPopular: false,
+  { 
+    name: "Бизнес", 
+    price: "125 000 ₸", 
+    features: ["Приоритетные доки", "Скидка на доставку", "До 10 авто в месяц"], 
+    color: "border-purple-500",
+    desc: "Для малых дилеров",
+    char: "Б"
   },
-  {
-    name: "VIP",
-    tagline: "ПОЛНЫЙ ЭКСКЛЮЗИВ",
-    price: "250 000 ₸",
-    features: [
-      { text: "Закрытые аукционы", included: true },
-      { text: "Личный менеджер", included: true },
-      { text: "Помощь в растаможке", included: true },
-      { text: "Безлимит авто", included: true },
-      { text: "Все типы уведомлений", included: true },
-      { text: "Полный отчет по VIN", included: true },
-      { text: "Приоритет в торгах", included: true },
-    ],
-    buttonText: "ВЫБРАТЬ ПЛАН",
-    isCurrent: false,
-    isPopular: false,
+  { 
+    name: "VIP", 
+    price: "250 000 ₸", 
+    features: ["Закрытые аукционы", "Личный менеджер", "Помощь в растаможке"], 
+    color: "border-yellow-500",
+    desc: "Полный эксклюзив",
+    char: "V"
   },
 ];
 
-// Данные для аккордеона FAQ
 const FAQ_ITEMS = [
   {
     question: "Можно ли сменить тариф?",
-    answer: "Да, вы можете сменить тариф в любое время. При повышении уровня доступа — новые лимиты и возможности появятся мгновенно после подтверждения.",
+    answer: "Да, вы можете сменить тариф в любое время. При повышении — доступ появится мгновенно после подтверждения транзакции.",
   },
   {
     question: "Как происходит оплата?",
-    answer: "Оплата производится через платежные сервисы Kaspi Pay, Halyk, Kaspi Gold или любой другой банковской картой. Счет на оплату за следующий месяц выставляется автоматически за 3 дня до окончания текущего.",
+    answer: "Оплата производится через Kaspi Pay, Halyk, Kaspi Gold или банковской картой. Выставляется счёт на следующий месяц.",
   },
   {
     question: "Есть ли пробный период?",
-    answer: "Базовый план абсолютно бесплатен и активен по умолчанию. Для тарифов СТАНДАРТ и ДРАЙВ доступен бесплатный ознакомительный 7-дневный пробный период.",
+    answer: "Базовый план бесплатен и доступен всегда. Для СТАНДАРТ и выше доступен 7-дневный пробный период.",
   },
   {
     question: "Что такое закрытые аукционы?",
-    answer: "Закрытые аукционы — это эксклюзивные торги с редкими, коллекционными или люксовыми автомобилями, доступными для торгов исключительно участникам с VIP-тарифом.",
+    answer: "Это эксклюзивные торги с редкими лотами, доступные только VIP-участникам. Там появляются уникальные и дорогостоящие автомобили.",
   },
 ];
 
 export default function TariffsPage() {
-  // Состояние для открытия аккордеона FAQ
-  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
-
-  const toggleFaq = (index: number) => {
-    setOpenFaqIndex(openFaqIndex === index ? null : index);
-  };
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   return (
-    <div className="mx-auto w-full max-w-[1440px] px-6 py-16 md:px-12 space-y-24">
-      
-      {/* Шапка страницы */}
-      <div className="text-center space-y-4">
-        <h1 className="text-3xl font-black text-white uppercase tracking-tight md:text-5xl">
-          ТАРИФНЫЕ <span className="text-brand-orange">ПЛАНЫ</span>
-        </h1>
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-textSecondary">
-          Выберите подходящий уровень доступа к торгам
-        </p>
-        <div className="pt-2">
-          <span className="inline-block rounded-full bg-brand-orange/10 border border-brand-orange/30 px-5 py-2 text-xs font-bold text-brand-orange">
-            Текущий тариф: <span className="font-black">DRIVE</span>
-          </span>
-        </div>
-      </div>
+    <main className="bg-[#020617] min-h-screen text-white font-sans selection:bg-orange-500 selection:text-black">
+      <Header />
 
-      {/* Сетка тарифов */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5 items-stretch">
-        {TARIFFS.map((tariff, idx) => (
-          <div
-            key={idx}
-            className={`relative flex flex-col justify-between rounded-2xl border bg-brand-card p-6 transition-all duration-300 ${
-              tariff.isCurrent
-                ? "border-brand-orange shadow-[0_0_25px_rgba(255,92,0,0.2)] scale-[1.03] z-10"
-                : "border-brand-border hover:border-brand-orange/50"
-            }`}
-          >
-            {/* Метка "ХИТ" для популярного тарифа */}
-            {tariff.isPopular && (
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded bg-brand-orange px-3 py-1 text-[9px] font-black uppercase text-white tracking-widest">
-                ХИТ
-              </span>
-            )}
-
-            {/* Заголовок тарифа */}
-            <div className="space-y-4">
-              <div className="text-center">
-                <p className="text-[10px] font-black tracking-widest text-brand-textSecondary uppercase">
-                  {tariff.tagline}
-                </p>
-                <h3 className="mt-2 text-lg font-black text-white">{tariff.name}</h3>
-              </div>
-
-              {/* Стоимость */}
-              <div className="text-center border-b border-brand-border/60 pb-5">
-                <span className="text-2xl font-black text-white">{tariff.price}</span>
-                <span className="text-[10px] text-brand-textSecondary font-semibold"> / месяц</span>
-              </div>
-
-              {/* Опции тарифа */}
-              <ul className="space-y-3.5 pt-2">
-                {tariff.features.map((feature, fIdx) => (
-                  <li
-                    key={fIdx}
-                    className={`flex items-start gap-2.5 text-xs ${
-                      feature.included ? "text-white" : "text-brand-textSecondary/45"
-                    }`}
-                  >
-                    <span className={`text-[13px] font-bold shrink-0 ${feature.included ? "text-emerald-500" : "text-red-500/50"}`}>
-                      {feature.included ? "✓" : "✕"}
-                    </span>
-                    <span className="leading-tight">{feature.text}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Кнопка действия */}
-            <div className="pt-8">
-              <button
-                disabled={tariff.isCurrent}
-                className={`w-full rounded-xl py-3.5 text-[10px] font-black tracking-wider transition-all border ${
-                  tariff.isCurrent
-                    ? "bg-transparent border-brand-orange text-brand-orange cursor-default"
-                    : "bg-brand-bg/50 border-brand-border text-brand-textSecondary hover:border-brand-orange hover:text-white"
-                }`}
-              >
-                {tariff.buttonText}
-              </button>
-            </div>
-
+      <div className="container mx-auto px-4 pt-40 pb-24">
+        
+        {/* Хедер страницы */}
+        <div className="text-center mb-16 space-y-4">
+          <h1 className="text-5xl font-black uppercase italic tracking-tighter leading-none">
+            ТАРИФНЫЕ <span className="text-orange-500">ПЛАНЫ</span>
+          </h1>
+          <p className="text-slate-500 uppercase text-[10px] tracking-[0.4em] font-bold">
+            Выберите подходящий уровень доступа к торгам
+          </p>
+          <div className="pt-2">
+            <span className="inline-block rounded-full bg-[#0f172a] border border-white/5 px-5 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
+              Текущий тариф: <span className="text-orange-500">DRIVE</span>
+            </span>
           </div>
-        ))}
-      </div>
-
-      {/* Секция FAQ */}
-      <div className="mx-auto max-w-3xl space-y-10">
-        <div className="text-center">
-          <h2 className="text-2xl font-black tracking-tight text-white md:text-3xl">ЧАСТЫЕ ВОПРОСЫ</h2>
         </div>
 
-        {/* Интерактивный Аккордеон */}
-        <div className="space-y-4">
-          {FAQ_ITEMS.map((faq, idx) => {
-            const isOpen = openFaqIndex === idx;
-            return (
-              <div
-                key={idx}
-                className="overflow-hidden rounded-xl border border-brand-border bg-brand-card transition-all"
-              >
-                {/* Кнопка раскрытия */}
-                <button
-                  type="button"
-                  onClick={() => toggleFaq(idx)}
-                  className="flex w-full items-center justify-between px-6 py-5 text-left text-sm font-bold text-white outline-none hover:text-brand-orange transition-colors"
-                >
-                  <span>{faq.question}</span>
-                  <span className={`text-xs text-brand-textSecondary transition-transform ${isOpen ? "rotate-180" : ""}`}>
-                    ▼
-                  </span>
-                </button>
+        {/* Сетка тарифов (Брутализм v4) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {PLANS.map((plan) => (
+            <div 
+              key={plan.name} 
+              className={`bg-slate-900/50 border-t-4 ${plan.color} border-x border-b border-white/5 p-8 rounded-[2rem] flex flex-col justify-between hover:bg-slate-800 transition-all duration-500 group cursor-pointer hover:-translate-y-2 shadow-2xl relative overflow-hidden`}
+            >
+              {/* Хит продаж */}
+              {plan.isPopular && (
+                <span className="absolute top-3 right-6 bg-orange-500 text-black text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest italic z-20">
+                  ХИТ
+                </span>
+              )}
 
-                {/* Раскрывающийся текст ответа */}
-                <div
-                  className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                    isOpen ? "max-h-40 border-t border-brand-border/40" : "max-h-0"
-                  }`}
-                >
-                  <p className="px-6 py-5 text-xs leading-relaxed text-brand-textSecondary">
-                    {faq.answer}
-                  </p>
-                </div>
+              {/* Декор на фоне карточки */}
+              <div className="absolute -right-4 -top-4 text-white/5 font-black text-6xl italic select-none uppercase">
+                {plan.char}
               </div>
-            );
-          })}
+
+              <div className="relative z-10 text-left">
+                <p className="text-[9px] text-orange-500 font-black uppercase tracking-widest mb-2 italic">{plan.desc}</p>
+                <h4 className="text-2xl font-black uppercase italic text-white group-hover:text-orange-500 transition-colors tracking-tighter">
+                  {plan.name}
+                </h4>
+                <p className="text-3xl font-black text-white mt-6 mb-8 tracking-tighter">{plan.price}</p>
+                
+                <ul className="space-y-4">
+                  {plan.features.map(f => (
+                    <li key={f} className="text-[10px] text-slate-400 uppercase font-bold flex items-start gap-2 leading-relaxed">
+                      <span className="text-orange-500">/</span> {f}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <Link 
+                href="/register"
+                className="w-full mt-10 py-5 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all italic text-center"
+              >
+                Выбрать план
+              </Link>
+            </div>
+          ))}
         </div>
+
+        {/* Раздел вопросов (FAQ) */}
+        <div className="max-w-4xl mx-auto mt-32 space-y-16">
+          <div className="text-center">
+            <h2 className="text-4xl font-black uppercase italic tracking-tighter mb-4">
+              Частые <span className="text-orange-500 underline decoration-1 underline-offset-8">Вопросы</span>
+            </h2>
+            <p className="text-slate-500 uppercase text-[10px] tracking-[0.4em] font-bold">Ответы на часто возникающие вопросы</p>
+          </div>
+
+          <div className="space-y-4">
+            {FAQ_ITEMS.map((faq, idx) => {
+              const isOpen = openFaq === idx;
+              return (
+                <div key={idx} className="rounded-2xl border border-white/5 bg-[#0f172a] overflow-hidden">
+                  <button
+                    onClick={() => setOpenFaq(isOpen ? null : idx)}
+                    className="w-full flex justify-between items-center px-8 py-6 text-left text-sm font-black uppercase italic tracking-wider hover:text-orange-500 transition-colors"
+                  >
+                    <span>{faq.question}</span>
+                    <span className="text-slate-500 text-xs">{isOpen ? "▲" : "▼"}</span>
+                  </button>
+                  {isOpen && (
+                    <div className="px-8 pb-6 text-xs text-slate-400 leading-relaxed font-semibold uppercase tracking-wider text-left border-t border-white/5 pt-4">
+                      {faq.answer}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
       </div>
 
-    </div>
+      <Footer />
+    </main>
   );
 }
