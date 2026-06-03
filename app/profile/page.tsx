@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Link from "next/link";
@@ -26,49 +27,84 @@ const MY_BIDS = [
     image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=200",
     status: "outbid",
   },
-  {
-    id: "4",
-    title: "Mercedes-Benz S580 2023",
-    myBid: "38 000 000",
-    image: "https://images.unsplash.com/photo-1617531653332-bd046c24f206?q=80&w=200",
-    status: "outbid",
-  },
-  {
-    id: "5",
-    title: "Bentley Continental GT 2021",
-    myBid: "70 000 000",
-    image: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?q=80&w=200",
-    status: "outbid",
-  },
 ];
 
 export default function ProfilePage() {
+  const [user, setUser] = useState<any>(null);
+  const [mounted, setMounted] = useState(false);
+  const [showFullPhone, setShowFullPhone] = useState(false); // Стейт для скрытия/показа телефона
+
+  useEffect(() => {
+    setMounted(true);
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
+
+  // Функция маскирования телефона (скрывает всё, кроме последних 4 цифр)
+  const getMaskedPhone = (phoneStr: string) => {
+    if (!phoneStr) return "";
+    // Оставляет только последние 5 символов (например, -56-78)
+    return `+7 (***) ***${phoneStr.slice(-6)}`;
+  };
+
+  if (!mounted || !user) {
+    return (
+      <main className="bg-[#020617] min-h-screen text-white font-sans flex items-center justify-center">
+        <p className="text-xl font-black uppercase tracking-widest animate-pulse">Загрузка профиля...</p>
+      </main>
+    );
+  }
+
+  // Определяем тариф (если у нового юзера его нет, ставим дефолтный "БАЗОВЫЙ")
+  const userTariff = user.tariff || "БАЗОВЫЙ";
+  const userCity = user.city || "Алматы";
+  const userPhone = user.phone || "+7 (700) 000-00-00";
+
   return (
     <main className="bg-[#020617] min-h-screen text-white font-sans selection:bg-orange-500 selection:text-black pt-32">
       <Header />
       
       <div className="mx-auto w-full max-w-[1440px] px-6 py-12 md:px-12 space-y-12">
         
-        {/* Профиль */}
+        {/* Карточка пользователя */}
         <div className="flex flex-col gap-6 rounded-[2.5rem] border border-white/5 bg-[#0f172a] p-8 md:flex-row md:items-center md:justify-between shadow-2xl">
           <div className="flex items-center gap-6">
             <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-orange-500 text-2xl font-black text-black italic">
-              А
+              {user.nickname.charAt(0).toUpperCase()}
             </div>
             <div className="space-y-1.5 text-left">
-              <h2 className="text-2xl font-black text-white uppercase italic tracking-tighter">Алибек Джаксыбеков</h2>
-              <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">user@drive.kz</p>
-              <div className="flex gap-2 pt-1">
-                <span className="rounded bg-orange-500/10 border border-orange-500/20 px-3 py-1 text-[9px] font-black text-orange-500 italic">
-                  ДРАЙВ
+              <h2 className="text-2xl font-black text-white uppercase italic tracking-tighter">
+                {user.nickname}
+              </h2>
+              <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">
+                {user.email}
+              </p>
+              
+              {/* Поле телефона с кнопкой маскирования */}
+              <div className="flex items-center gap-2 text-xs text-slate-500 font-bold uppercase tracking-wide">
+                <span>📞</span>
+                <span>{showFullPhone ? userPhone : getMaskedPhone(userPhone)}</span>
+                <button 
+                  onClick={() => setShowFullPhone(!showFullPhone)}
+                  className="text-orange-500 hover:underline uppercase text-[9px] tracking-widest ml-1 cursor-pointer font-black italic"
+                >
+                  {showFullPhone ? "[скрыть]" : "[показать]"}
+                </button>
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <span className="rounded bg-orange-500/10 border border-orange-500/20 px-3 py-1 text-[9px] font-black text-orange-500 uppercase tracking-widest italic">
+                  {userTariff}
                 </span>
-                <span className="rounded bg-white/5 border border-white/5 px-3 py-1 text-[9px] font-black text-slate-400">
-                  Алматы
+                <span className="rounded bg-white/5 border border-white/10 px-3 py-1 text-[9px] font-black text-slate-400 uppercase tracking-widest italic">
+                  {userCity}
                 </span>
               </div>
             </div>
           </div>
-          <Link href="/tariffs" className="rounded-2xl border border-white/5 px-6 py-4 text-[10px] font-black uppercase tracking-widest text-white hover:border-orange-500 hover:bg-orange-500/5 transition-all text-center italic">
+          <Link href="/tariffs" className="px-8 py-4 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all italic text-center">
             Улучшить тариф
           </Link>
         </div>
